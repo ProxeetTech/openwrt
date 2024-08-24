@@ -20,6 +20,4 @@ include $(INCLUDE_DIR)/target.mk
 
 DEFAULT_PACKAGES += kmod-usb-hid
 
-KERNELNAME:=zImage dtbs
-
 $(eval $(call BuildTarget))
