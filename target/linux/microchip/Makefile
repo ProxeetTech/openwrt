@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 ARCH:=arm
 BOARD:=microchip
 BOARDNAME:=Microchip lan96xx
-FEATURES:=rtc squashfs usb usbgadget
+FEATURES:=gpio rtc usb usbgadget squashfs targz nand ubifs boot-part rootfs-part ext4
 SUBTARGETS:=lan9668 lan9694
 
 KERNEL_PATCHVER:=6.1

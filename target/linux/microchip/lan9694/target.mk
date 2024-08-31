@@ -7,7 +7,7 @@ ARCH:=aarch64
 SUBTARGET:=lan9694
 BOARDNAME:=lan9694 boards (64 bit)
 CPU_TYPE:=cortex-a53
-KERNELNAME:=vmlinux Image.gz dtbs
+KERNELNAME:=vmlinux Image Image.gz dtbs
 
 define Target/Description
 	Build firmware image for lan9694 devices.
