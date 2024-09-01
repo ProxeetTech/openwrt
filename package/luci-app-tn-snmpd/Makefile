@@ -1,0 +1,17 @@
+#
+# Copyright (c) 2018, Tano Systems. All Rights Reserved.
+# Anton Kikin <a.kikin@tano-systems.com>
+#
+
+include $(TOPDIR)/rules.mk
+
+LUCI_TITLE:=Net-SNMP LuCI interface
+LUCI_DEPENDS:=+luci-base +snmpd
+LUCI_DESCRIPTION:=Some common net-snmp config items. In no way is this comprehensive.
+
+PKG_MAINTAINER:= Karl Palsson <karlp@etactica.com>
+PKG_LICENSE:=Apache-2.0
+
+include $(TOPDIR)/feeds/luci/luci.mk
+
+# call BuildPackage - OpenWrt buildroot signature
