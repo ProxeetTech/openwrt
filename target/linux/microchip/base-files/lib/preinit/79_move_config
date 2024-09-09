@@ -1,0 +1,14 @@
+# Copyright (C) 2024
+
+. /lib/upgrade/common.sh
+
+move_config() {
+	[ -f "/$BACKUP_FILE" ] && {
+		echo "- Restoring configuration files -"
+		tar xzf "/$BACKUP_FILE" -C /
+		rm -f "/$BACKUP_FILE"
+		sync
+	}
+}
+
+[ "$INITRAMFS" = "1" ] || boot_hook_add preinit_main move_config
