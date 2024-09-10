@@ -14,7 +14,7 @@ platform_check_image() {
 }
 
 platform_do_upgrade() {
-	local diskdev boot_part
+	local diskdev boot_part tmp
 
 	echo "platform_do_upgrade"
 	boot_part=`fw_printenv -n mmc_cur`
@@ -29,6 +29,10 @@ platform_do_upgrade() {
 
 	# change boot partition
 	fw_setenv mmc_cur "$PROXEET_ACTIVE_PART"
+	fw_setenv mmc_cur "$PROXEET_ACTIVE_PART"
+	tmp=`fw_printenv -n mmc_cur`
+	echo "New boot part: ""$tmp"
+
 	sync
 
 	echo "platform_do_upgrade exit"
