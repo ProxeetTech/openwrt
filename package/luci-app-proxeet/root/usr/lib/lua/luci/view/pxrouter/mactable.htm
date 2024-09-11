@@ -1,0 +1,364 @@
+    <%+header%>
+    <% local resource = luci.http.context.template_header.resource %>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <meta name="viewport"
+        content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+    <title></title>
+
+    
+    <link rel="stylesheet" href="/luci-static/resources/view/pxrouter/fontawesome.css">
+    <link rel="stylesheet" href="/luci-static/resources/view/pxrouter/all.css">
+
+
+    <link rel="stylesheet" href="<%= index_css %>" >
+
+    <style>
+
+    body {
+
+         background-color: <%= bg_color %>; 
+    }    
+
+   
+
+    .btn {
+
+        color: var(<%= btn_text_color %>);
+        background-color: var(<%= table_header_color %>);
+    }
+
+   
+
+
+    .table-header {
+
+        padding: 1rem !important;
+        background-color: var(<%= table_header_color %>); 
+        box-shadow: 5px 5px 5px #292727;
+
+    }
+   
+    
+
+    </style>
+
+    <script>
+
+    let api_endpoint = "<%= api_endpoint %>";
+    let table_headers_names = <%= table_headers_names %>;
+  
+    const dataFilter = {
+
+        filterDataByIdUp(){
+
+            let data = dataManager.getData();
+            data.sort((a, b) => b.id - a.id);
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataById");
+
+        },
+        filterDataByIdDown(){
+
+            let data = dataManager.getData();
+            data.sort((a, b) => a.id - b.id);
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataById");
+
+        },
+        filterDataByMACUp() {
+            let data = dataManager.getData();
+            data.sort((a, b) => a.mac.localeCompare(b.mac));
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataByMACUp");
+        },
+
+        filterDataByMACDown() {
+            let data = dataManager.getData();
+            data.sort((a, b) => b.mac.localeCompare(a.mac));
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataByMACDown");
+        },
+
+        filterDataByDeviceUp() {
+            let data = dataManager.getData();
+            data.sort((a, b) => a.dev.localeCompare(b.dev));
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataByDeviceUp");
+        },
+
+        filterDataByDeviceDown() {
+            let data = dataManager.getData();
+            data.sort((a, b) => b.dev.localeCompare(a.dev));
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataByDeviceDown");
+        },
+            filterDataByTypeUp() {
+            let data = dataManager.getData();
+            data.sort((a, b) => {
+                const typeA = a.iface || "";
+                const typeB = b.iface || "";
+                return typeA.localeCompare(typeB);
+            });
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataByTypeUp");
+        },
+
+        filterDataByTypeDown() {
+            let data = dataManager.getData();
+            data.sort((a, b) => {
+                const typeA = a.iface || "";
+                const typeB = b.iface || "";
+                return typeB.localeCompare(typeA);
+            });
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataByTypeDown");
+        },
+
+        filterDataByFlagsUp() {
+            let data = dataManager.getData();
+            data.sort((a, b) => {
+                const flagsA = a.perm || "";
+                const flagsB = b.perm || "";
+                return flagsA.localeCompare(flagsB);
+            });
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataByFlagsUp");
+        },
+
+        filterDataByFlagsDown() {
+            let data = dataManager.getData();
+            data.sort((a, b) => {
+                const flagsA = a.perm || "";
+                const flagsB = b.perm || "";
+                return flagsB.localeCompare(flagsA);
+            });
+            dataManager.setData(data);
+            redraw_data();
+            console.log("filterDataByFlagsDown");
+        },
+
+
+
+    }
+
+    function search_in_data() {
+
+        console.log("search_call");
+
+    function searchEntries(entries, searchCriteria) {
+        return entries.filter(entry => {
+            const searchText = searchCriteria.toLowerCase().trim();
+            return (
+                entry.mac.toLowerCase().includes(searchText) ||
+                entry.dev.toLowerCase().includes(searchText) ||
+                entry.iface.toLowerCase().includes(searchText) ||
+                entry.perm.toLowerCase().includes(searchText)
+            );
+        });
+    }
+
+    let req = document.getElementById("search");
+
+    const searchCriteria = req.value;
+
+    console.log(req.value);
+
+    const result = searchEntries(dataManager.getData(), searchCriteria);
+    console.log(result);
+
+    dataManager.clearData();
+    dataManager.setData(result);
+
+    console.log(JSON.stringify(result));
+    redraw_data();
+    }
+
+    window.onload = async function() {
+
+        try {
+
+                await fetchData();
+                
+                document.getElementById("search").value = "";
+                
+                let pageDevide = document.getElementById("limit_select");
+                let totalPages = Math.ceil(Object.keys(dataManager.getData()).length / pageDevide.value);
+                let currentPage = 1;
+
+                createPagination(totalPages, currentPage);
+                let res = set_pagination_button_active(1);
+
+                console.log("Result: "+res);
+
+
+                wait_data(false);
+
+
+            } catch (error) {
+
+                console.error("Ошибка при загрузке данных:", error);
+
+            }
+
+    }
+
+
+    </script>
+
+    <script src="<%= tables_js %>" defer></script>
+
+
+</head>
+
+<body>
+
+    <center>
+        <h1 class="" style="color: var(<%= btn_text_color %>);"><%= page_header %></h1>
+    </center>
+
+
+<div style="display: flex; justify-content: center; align-items: center;">
+
+    <div style="display: flex; align-items: center; ">
+        <p style="margin: 0; padding-right: 5px; display: flex; align-items: center;">Result on page</p>
+
+        <select id='limit_select' onchange="change_limit(this.value)" class="select" style="margin-left: 5px;">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="1000">1000</option>
+            <option value="all">all</option>
+        </select>
+    </div>
+    <!--<button onclick="clear_table()" class="btn btn-rectangle" style="margin-left: 10px;">clear table</button>-->
+    <button onclick="renew_data()"  class="btn btn-rectangle" style="margin-left: 10px;">Renew data</button>
+    <!--<button onclick="wait_data(true)"  class="btn btn-rectangle"  style="margin-left: 10px;">wait on</button>
+    <button onclick="wait_data(false)"  class="btn btn-rectangle"  style="margin-left: 10px;">wait off</button>-->
+</div>
+
+
+<div
+    style="padding-right: 5rem; margin-top: 2rem; border: 0px solid red; display: flex; justify-content: end; align-items: center;"
+    id="pg_buttons_container"
+    >
+
+
+
+
+</div>
+
+
+<div style="padding-right: 5rem; margin-top: 2rem; display: flex; justify-content: end; align-items: center;">
+
+    <input type="text" id="search" placeholder="Search" />
+    <button onclick="clear_field()" class="btn btn-square" style="color: var(<%= btn_text_color %>); background-color: var(<%= table_header_color %>);margin-left: 10px;">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <button onclick="search_in_data()" class="btn btn-square" style="color: var(<%= btn_text_color %>); background-color: var(<%= table_header_color %>);margin-left: 10px;">
+        <i class="fa-solid fa-search"></i>
+    </button>
+
+
+
+
+
+</div>
+
+
+
+<br/>
+<br/>
+<br/>
+
+    <center>
+        <div class="">
+            <div class="">
+                <div class="" style="border: 0px solid red">
+                    <div class="" style="width: 80%;">
+                        <div id="table_container" style="position: relative; border: 0px solid red">
+                            <div id="px_wait_container" style="position: absolute; z-index: 600; width: 100%; text-align: center;">
+                                <div style="position: relative; display: inline-block;">
+                                    <img id="px_wait" style="margin: 2rem; width: 13rem;" src="<%= resource %>/img/px.svg" />
+                                    <div id="loading_text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; color: var(--proxeet-white); animation: blink 1s step-start infinite;">
+                                        Loading...
+                                    </div>
+                                </div>
+                            </div>
+
+                        <center>
+                            <table class="table">
+                              <thead class="table-header">
+                                <tr >
+                                    <th class="table-header-th">№
+                                        <div class="icon-container">
+                                            <i onclick="dataFilter.filterDataByIdUp()"class="fa-solid fa-chevron-up"></i>
+                                            <i onclick="dataFilter.filterDataByIdDown()" class="fa-solid fa-chevron-down"></i>
+                                        </div>
+                                    </th>
+                                    <th>MAC Address
+                                        <div class="icon-container">
+                                            <i onclick="dataFilter.filterDataByMACUp()" class="fa-solid fa-chevron-up"></i>
+                                            <i onclick="dataFilter.filterDataByMACDown()" class="fa-solid fa-chevron-down"></i>
+                                        </div>
+                                    </th>
+                                    <th>Device
+                                        <div class="icon-container">
+                                            <i onclick="dataFilter.filterDataByDeviceUp()" class="fa-solid fa-chevron-up"></i>
+                                            <i onclick="dataFilter.filterDataByDeviceDown()" class="fa-solid fa-chevron-down"></i>
+                                        </div>
+                                    </th>
+                                    <th>Type
+                                        <div class="icon-container">
+                                            <i onclick="dataFilter.filterDataByTypeUp()" class="fa-solid fa-chevron-up"></i>
+                                            <i onclick="dataFilter.filterDataByTypeDown()" class="fa-solid fa-chevron-down"></i>
+                                        </div>
+                                    </th>
+                                    <th>Flags
+                                        <div class="icon-container">
+                                            <i onclick="dataFilter.filterDataByFlagsUp()" class="fa-solid fa-chevron-up"></i>
+                                            <i onclick="dataFilter.filterDataByFlagsDown()" class="fa-solid fa-chevron-down"></i>
+                                        </div>
+                                    </th>
+                                </tr>
+                                </thead>
+
+                              <tbody id="main_mac_table">
+                              </tbody>
+
+                            </table>
+                        </center>
+                    </div>
+
+
+
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </div>
+    </center>
+
+    <script>
+
+
+
+    </script>
+
+
+<%+footer%>

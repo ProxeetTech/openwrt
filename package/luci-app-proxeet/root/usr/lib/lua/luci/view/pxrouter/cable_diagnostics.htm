@@ -1,0 +1,1028 @@
+<%+header%>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <meta name="viewport"
+            content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+        <title></title>
+
+
+</head>
+
+<body>
+    <style>
+        :root {
+
+            --proxeet-orange: #FF7E33;
+            --proxeet-blue: #152F4E;
+            --proxeet-swich-background-gray: #F7F7F7;
+            --proxeet-light-blue: #00477A;
+            --proxeet-ll-blue: #95BBDB;
+            --proxeet-white: #FFFFFF;
+            --proxeet-swich-background-gray: #696161;
+            --proxeet-danger: #dc3545;
+            --proxeet-green: #157347;
+
+            --proxeet-dark-background: #1e1e1e;
+
+        }
+
+        body {
+
+            background-color: var(<%= bg_color %>);
+        }
+
+        .blue-text {
+
+            color: var(--proxeet-blue);
+            margin: 0;
+        }
+
+        table {
+
+            border: 0 !important;
+        }
+
+        th {
+            color: var(--proxeet-blue);
+            background-color: var(--proxeet-white) !important;
+            border: 0 !important;
+        }
+
+        tr {
+
+            border: 0 !important;
+        }
+
+        table>tbody>tr>th,
+        table>tfoot>tr>th,
+        table>thead>tr>th {
+
+            border: 0 !important;
+        }
+
+        .img-cable {
+            filter: grayscale(1);
+            border: 1px solid black;
+        }
+
+
+        .my-1 {
+
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .my-0-5 {
+
+            margin-top: .5rem;
+            margin-bottom: .5rem;
+        }
+
+        .mx-1 {
+
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
+
+        .centered-div {
+            /* border: 1px solid red; */
+            width: 4rem;
+            height: 4rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            line-height: 1;
+
+        }
+
+        .centered-div-1-5 {
+            border: 1px solid gray;
+            border-radius: 0.3rem;
+            width: 6rem;
+            height: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            line-height: 1;
+
+        }
+
+        .centered-img-div {
+
+            /* border: 1px solid red; */
+            width: 10rem;
+            height: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            line-height: 1;
+
+        }
+
+        .led-off {
+
+            /* margin-left: 4rem; */
+            width: 2rem;
+            height: 1rem;
+            border: 1px solid gray;
+            border-radius: 0.3rem;
+        }
+
+        .m-0 {
+            margin: 0.3rem;
+        }
+
+
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        
+        .blink {
+            animation: blink 0.8s step-start infinite; 
+        }
+
+       
+
+
+
+    </style>
+
+        <div style="text-align: center;">
+            <h1 class="my-3" style="margin: 3rem 0; color: var(<%= btn_text_color %>);">Cable line diagnostics</h1>
+        </div>
+
+
+
+
+    <div class="bootstrap-container">
+
+
+
+        <div class="row justify-content-center text-start my-3">
+
+
+
+
+
+
+
+        </div>
+
+        <div class="" style="text-align: center; display: flex; justify-content: center; align-items: center;">
+            <div class="" style="margin-right: 3rem">
+                <span class="" style="font-size: 1.6rem; color: var(--proxeet-white);">Choose port</span>
+            </div>
+            
+          
+
+            <div class="">
+
+
+                <select id="port-select" onchange="port()"
+                    style="
+                            width: 15rem;
+                            height: 3rem;
+                            font-size: 1.6rem;
+                            color: var(<%= btn_text_color %>);
+                            background-color: var(<%= bg_color %>);
+                            padding: 0 0.5rem;
+                            border-radius: .35rem;
+
+                          "
+
+                    >
+                     <% for _, iface in ipairs(interface_list) do %>
+                        <option value="<%= iface %>"><%= iface %></option>
+                     <% end %>
+
+                </select>
+
+            </div>
+        </div>
+
+        <div style="margin-left: 3.5%; width: 90%; margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; min-height: 30rem; background-color: var(--proxeet-white); padding: 1rem;">
+            
+           
+
+            
+            <div style="width: 20rem; height: 100%; display: flex; justify-content: center; align-items: center; background-color: var(--proxeet-white);">
+                <div id="card-1" style="text-align: center; justify-content: center;">
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <h3 id="selected_port" style="color: var(--proxeet-blue); font-size: 2.6rem; margin: 0;"><%= interface_list[1] %></h3>
+
+                    </div>
+
+                    <div  style="border: 0px solid red; justify-content: center; text-align: center; margin-top: 2rem;">
+                        <table style="border: 0px solid red !important; margin: 0 auto;">
+                            <tr>
+                                <th><p style="margin: .2rem;">1</p></th>
+                                <th><p style="margin: .2rem;">2</p></th>
+                                <th><p style="margin: .2rem;">3</p></th>
+                                <th><p style="margin: .2rem;">4</p></th>
+                                <th><p style="margin: .2rem;">5</p></th>
+                                <th><p style="margin: .2rem;">6</p></th>
+                                <th><p style="margin: .2rem;">7</p></th>
+                                <th><p style="margin: .2rem;">8</p></th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="border: 0px solid red; margin-top: 0rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <img src="<%= img_dir %>ethernet22.svg" alt="Ethernet Image" style="padding: 1.2rem; padding-top: 0; max-height: 28rem; width: auto; display: block;">
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="card-2" style="margin-left: 2%; border: 0px solid red; width: 75%; height: 100%; display: block;">
+
+                <div class="px-string" style="border-bottom: 1px solid var(--proxeet-dark-background)">
+                    <h2 style="color: #000;">Data link layer status</h2>
+                </div>
+
+                <div class="px-string"  style="border: 0px solid red; display: flex; justify-content: start;">
+                    <div>
+                        <h3  style="color: #000;" class="m-0" >Link detection:</h3>
+                    </div>
+                    <div>
+                        <h3 class="m-0"  style="color: #000;" id="port_link_state"></h3>
+                    </div>
+                    <div>
+                        <h3 class="m-0"  style="color: #000;" id="port_link_state_test"></h3>
+                    </div>
+                </div>
+
+                <div class="px-string" style="border: 0px solid red; display: flex; justify-content: start;">
+                    <div>
+                        <h3 style="color: #000;" id="port_speed_header" class="m-0" >Speed:</h3>
+                    </div>
+                    <div>
+                        <h3  style="color: #000;"  class="m-0"  id="port_speed_state"></h3>
+                    </div>
+                    <div>
+                        <h3  style="color: #000;"  class="m-0"  id="port_speed_state_test"></h3>
+                    </div>
+                </div>
+
+                <div class="px-string" style="border: 0px solid red; display: flex; justify-content: start;">
+                    <div>
+                        <h3  style="color: #000;" id="port_duplex_header" class="m-0">Duplex:</h3>
+                    </div>
+                    <div>
+                        <h3  style="color: #000;" class="m-0" id="port_duplex_state"></h3>
+                    </div>
+                    <div>
+                        <h3  style="color: #000;" class="m-0" id="port_duplex_state_test"></h3>
+                    </div>
+                </div>
+
+                <div class="px-string" style="border: 0px solid red; display: flex; justify-content: end;">
+                    <div style="width: 70%; margin-right: 10%;">
+                        <h3   style="color: #000;" id="if_flapping" ></h3>
+                    </div>
+                    <div>
+
+                    </div>
+                </div>
+
+                <div class="px-string" style="border-bottom: 0px solid var(--proxeet-dark-background)">
+                    <h2 style="display: none; color: #000; ">Physical layer status</h2>
+                </div>
+
+                <div class="px-string" style="border: 0px solid red; display: flex; justify-content: start;">
+                    <div>
+                        <h3  style="display: none; color: #000;" class="m-0" >Port Admin Status:</h3>
+                    </div>
+                    <div>
+                        <h3  style="color: #000;" class="m-0" id="port_admin_state"></h3>
+                    </div>
+                    <div>
+                        <h3  style="color: #000;" class="m-0" id="port_admin_state_test"></h3>
+                    </div>
+                </div>
+
+                <div class="px-string" style="border-bottom: 1px solid var(--proxeet-dark-background)">
+                    <div style="display: flex; justify-content: start;">
+                        <div style="width: 15%;">
+                            <h2 style="color: #000;">Pair</h2>
+                        </div>
+                        <div style="width: 15%;">
+                            <h2 style="color: #000;">Pin</h2>
+                        </div>
+                        <div style="width: 15%;">
+                            <h2 style="color: #000;">Status</h2>
+                        </div>
+                        <div style="width: 70%;">
+                            <h2 id="port_pair_state_test" style="padding-left: 1rem; color: #000;"></h2>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="px-string"  style="border: 0px solid red; display: flex; justify-content: start;">
+                    <div style="width: 15%;">
+                        <h2  style="color: #000;"  class="m-0">A</h2>
+                    </div>
+                    <div style="width: 15%;">
+                        <h2  style="color: #000;" class="m-0">1,2</h2>
+                    </div>
+                    <div style="width: 70%;">
+                        <h2  style="color: #000;" id="pair_a_status"  class="m-0"></h2>
+                    </div>
+                </div>
+
+                <div class="px-string"  style="border: 0px solid red; display: flex; justify-content: start;">
+                    <div style="width: 15%;">
+                        <h2  style="color: #000;" class="m-0">B</h2>
+                    </div>
+                    <div style="width: 15%;">
+                        <h2  style="color: #000;"  class="m-0">3,6</h2>
+                    </div>
+                    <div style="width: 70%;">
+                        <h2  style="color: #000;" id="pair_b_status"  class="m-0"></h2>
+                    </div>
+                </div>
+
+                <div class="px-string"  style="border: 0px solid red; display: flex; justify-content: start;">
+                    <div style="width: 15%;">
+                        <h2  style="color: #000;" id="c_pair_header" class="m-0">C</h2>
+                    </div>
+                    <div style="width: 15%;">
+                        <h2  style="color: #000;" id="c_pair_header_pin"  class="m-0">4,5</h2>
+                    </div>
+                    <div style="width: 70%;">
+                        <h2  style="color: #000;" id="pair_c_status" class="m-0"></h2>
+                    </div>
+                </div>
+
+                <div class="px-string"  style="border: 0px solid red; display: flex; justify-content: start;">
+                    <div style="width: 15%;">
+                        <h2  style="color: #000;" id="d_pair_header"  class="m-0">D</h2>
+                    </div>
+                    <div style="width: 15%;">
+                        <h2  style="color: #000;" id="d_pair_header_pin"  class="m-0">7,8</h2>
+                    </div>
+                    <div style="width: 70%;">
+                        <h2 style="color: #000;" id="pair_d_status" class="m-0"></h2>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="" style=" border: 0px solid red; text-align: center;">
+            <p style="margin-top: 2rem; margin-bottom: 2rem; font-size: 1.6rem; color: var(--proxeet-white);" id="len"></p><!-- Cable lenght -->
+        </div>
+
+        <div style="border: 0px solid red; text-align: center;">
+            <button id="test_btn" onclick="test()" style="
+                    display: inline-block;
+                    color: var(--proxeet-white);
+                    font-size: 1.4rem;
+                    font-weight: 400;
+                    width: 16rem;
+                    height: 2.6rem;
+                    line-height: 1.3rem;
+                    border-radius: 4rem;
+                    background-color: var(--proxeet-orange);
+                    margin-bottom: 3rem;
+                 ">
+                Test
+            </button>
+        </div>
+
+    </div>
+
+
+
+        <script>
+
+
+
+
+            let theme = "<%= theme %>"
+            console.log(theme);
+            let bg_color = "<%= bg_color %>"
+            console.log(bg_color);
+            let btn_text_color = "<%= btn_text_color %>"
+            console.log(btn_text_color);
+            let table_header_color = "<%= table_header_color %>"
+            console.log(table_header_color);
+            let btn_bg_color = "<%= btn_bg_color %>"
+            console.log(btn_bg_color);
+
+
+            let interface_list = "<%= interface_list %>"
+            console.log(interface_list);
+
+            let api_endpoin_get_speed = "<%= api_endpoin_get_speed %>"
+            console.log(api_endpoin_get_speed);
+            let api_endpoin_get_duplex = "<%= api_endpoin_get_duplex %>"
+            console.log(api_endpoin_get_duplex);
+            let api_endpoin_get_link_detected = "<%= api_endpoin_get_link_detected %>"
+            console.log(api_endpoin_get_link_detected);
+            let api_endpoin_get_port_admin_status = "<%= api_endpoin_get_port_admin_status %>"
+            console.log(api_endpoin_get_port_admin_status);
+            let api_endpoin_get_pair_test = "<%= api_endpoin_get_pair_test %>"
+            console.log(api_endpoin_get_pair_test);
+            let api_endpoin_get_get_cable_state = "<%= api_endpoin_get_get_cable_state %>"
+            console.log(api_endpoin_get_get_cable_state);
+
+
+            let global_port = document.getElementById("port-select").value;
+
+            console.log("global port is: "+global_port);
+
+            let if_flapping_a = `Repeat the test. If the error persists, the cause could be a poor
+            RJ45 connector connection, a damaged cable, or a hardware
+            malfunction.`
+
+            let if_flapping_b = `Repeat the test. If the error occurs again, try disconnecting the
+            neighboring device from the Ethernet cable and retest. The issue
+            could be caused by a poor RJ45 connector connection, a
+            damaged cable, or a hardware malfunction.`
+
+            let port_speed_header = document.getElementById("port_speed_header");
+
+            let port_duplex_header = document.getElementById("port_duplex_header");
+
+            let port_link_state = document.getElementById("port_link_state");
+            const link_detected = [ "yes","no","err" ];
+
+            let port_speed_state = document.getElementById("port_speed_state");
+            const port_speed = [ "flapping","10Mb/s","100Mb/s","1000Mb/s" ];
+
+            let port_duplex_state = document.getElementById("port_duplex_state");
+            const port_duplex = ["full","half","err"];
+
+            let port_admin_state = document.getElementById("port_admin_state");
+            const port_admin = ["up","down","err"];
+
+            let pair_a_status = document.getElementById("pair_a_status");
+            let pair_b_status = document.getElementById("pair_b_status");
+            let pair_c_status = document.getElementById("pair_c_status");
+            let pair_d_status = document.getElementById("pair_d_status");
+
+
+
+            let port_link_state_test = document.getElementById("port_link_state_test");
+            let port_speed_state_test = document.getElementById("port_speed_state_test");
+            let port_duplex_state_test = document.getElementById("port_duplex_state_test");
+            let port_admin_state_test = document.getElementById("port_admin_state_test");
+            let port_pair_state_test = document.getElementById("port_pair_state_test");
+            
+            //port_link_state_indicator(port_link_state_test);
+            //port_link_state_indicator(port_speed_state_test);
+            //port_link_state_indicator(port_duplex_state_test);
+            //port_link_state_indicator(port_admin_state_test);
+            //port_link_state_indicator(port_pair_state_test);
+
+            function port_link_state_indicator(element) {
+                if (element.textContent.trim() === "Testing...") {
+                
+                    element.innerHTML = "";
+                    element.classList.remove("blink"); 
+                } else {
+                
+                    element.innerHTML = "Testing...";
+                    element.classList.add("blink"); 
+                }
+            }
+
+            
+
+
+
+
+
+ 
+            
+            
+            
+            const pair_state = ["ok","open in","shorted in","err"];
+            let pair_len = 0;
+            console.log("DEBUG");
+            let if_flapping = document.getElementById("if_flapping");
+
+            let red = "#dc3545";
+            let gray = "#696161";
+            let black = "#000"
+
+
+            let c_pair_header = document.getElementById("c_pair_header");
+            let c_pair_header_pin = document.getElementById("c_pair_header_pin");
+            let d_pair_header = document.getElementById("d_pair_header");
+            let d_pair_header_pin =  document.getElementById("d_pair_header_pin");
+
+
+            function port(){
+                global_port = document.getElementById("port-select").value;
+
+                document.getElementById("selected_port").innerHTML = global_port;
+
+                clear_all_value_for_test();
+            }
+
+
+           
+
+
+
+            async function get_link_detection_status(port){ 
+
+                port_link_state_indicator(port_link_state_test);
+            
+                console.log("get_link_detection_status started");
+
+                
+
+                const data = new URLSearchParams();
+
+
+
+                data.append('port', port);
+
+                fetch(api_endpoin_get_link_detected, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded', 
+                    },
+                    body: data.toString()
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Сетевая ошибка: ' + response.status);
+                    }
+                    return response.json();
+                    
+                })
+                .then(
+
+                    data => {
+
+                        console.log(data)
+
+                        table_Data_link_layer_status(data.link_detection)
+                    
+
+                    }
+
+                )
+                .catch(error => console.error('Ошибка:', error))
+                .finally(() => {  
+                    
+                    port_link_state_indicator(port_link_state_test);
+            
+                    console.log("get_link_detection_status passed"); });
+
+            }
+
+
+
+
+
+            async function get_speed_status(port){
+
+            port_link_state_indicator(port_speed_state_test);
+            
+
+                console.log("get_speed_status started");
+
+                
+
+                const data = new URLSearchParams();
+
+
+
+                data.append('port', port);
+
+                fetch(api_endpoin_get_speed, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: data.toString()
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Сетевая ошибка: ' + response.status);
+                    }
+                    return response.json();
+                    
+                })
+                .then(
+
+                    data => {
+
+                        console.log(data)
+
+                        table_set_speed_status(data.speed)
+                        
+
+                    }
+
+                )
+                .catch(error => console.error('Ошибка:', error))
+                .finally(() => { 
+                    
+            
+                    port_link_state_indicator(port_speed_state_test);
+            
+                    console.log("get_speed_status passed");  });
+
+            }
+
+
+
+            async function get_duplex_status(port){
+
+
+              port_link_state_indicator(port_duplex_state_test);
+            
+
+                console.log("get_duplex_status started");
+
+                
+
+                const data = new URLSearchParams();
+
+
+
+                data.append('port', port);
+
+                fetch(api_endpoin_get_duplex, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: data.toString()
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Сетевая ошибка: ' + response.status);
+                    }
+                    return response.json();
+                    
+                })
+                .then(
+
+                    data => {
+
+                        console.log(data);
+
+                        table_set_duplex_status(data.duplex);
+                        
+
+                    }
+
+                )
+                .catch(error => console.error('Ошибка:', error))
+                .finally(() => { 
+                    
+                    port_link_state_indicator(port_duplex_state_test);
+            
+                    console.log("get_duplex_status passed");  });
+
+            }
+
+
+            async function get_pair_test(global_port){
+
+              port_link_state_indicator(port_pair_state_test);
+
+                console.log("get_pair_test started");
+
+                
+
+                const data = new URLSearchParams();
+
+
+
+                data.append('port', global_port);
+                
+                fetch(api_endpoin_get_get_cable_state, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: data.toString()
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Сетевая ошибка: ' + response.status);
+                    }
+                    return response.json();
+                    
+                })
+                .then(
+
+                    data => {
+
+                        console.log(data);
+
+                        set_table_pair(data);
+                        
+
+                    }
+
+                )
+                .catch(error => console.error('Ошибка:', error))
+                .finally(() => {  
+                    
+                    port_link_state_indicator(port_pair_state_test);
+
+                    console.log("get_pair_test passed");  });
+                
+
+            }
+
+
+            async function get_port_admin_status(global_port){
+
+                await get_pair_test(global_port);
+
+                //port_link_state_indicator(port_admin_state_test);
+            
+
+                //console.log("get_port_admin_status started");
+
+              /*   
+
+                const data = new URLSearchParams();
+
+
+
+                data.append('port', global_port);
+
+                fetch(api_endpoin_get_port_admin_status, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: data.toString()
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Сетевая ошибка: ' + response.status);
+                    }
+                    return response.json();
+                    
+                })
+                .then(
+
+                    data => {
+
+                        console.log(data);
+
+                        set_table_port_admin_status(data);
+                        
+
+                    }
+
+                )
+                .catch(error => console.error('Ошибка:', error))
+                .finally(() => { 
+                    
+                    port_link_state_indicator(port_admin_state_test);
+            
+                    console.log("get_port_admin_status passed");  });
+
+ */
+            }
+
+           async function set_table_port_admin_status(data){
+
+                port_admin_state.innerHTML = data.port_admin_status;
+
+                if(data.port_admin_status.toLowerCase() == "down"){
+
+                    port_admin_state.style.color = red;
+
+                } else if(data.port_admin_status.toLowerCase() == "up"){
+
+                    port_admin_state.style.color = "#000";
+
+                   await get_pair_test(global_port);
+                }
+
+
+            }
+
+
+            function set_table_pair(data){
+
+
+
+
+                if(data.pair_a === "ok"){
+
+                    pair_a_status.innerHTML = data.pair_a.toUpperCase();
+
+                } else {
+
+                    if (typeof data.pair_a_len !== "undefined") {
+                            pair_a_status.innerHTML = data.pair_a + " " + data.pair_a_len;
+                        } else {
+                            pair_a_status.innerHTML = data.pair_a; 
+                        }
+                }
+
+                if(data.pair_b === "ok"){
+
+                pair_b_status.innerHTML = data.pair_b.toUpperCase();
+
+                } else {
+
+                    if (typeof data.pair_b_len !== "undefined") {
+                            pair_b_status.innerHTML = data.pair_b + " " + data.pair_b_len;
+                        } else {
+                            pair_b_status.innerHTML = data.pair_b; 
+                        }
+                }
+
+                if( data.pair_c_len == "0m" &  data.pair_d_len == "0m"  ){
+
+                    c_pair_header.style.color = gray;
+                    c_pair_header_pin.style.color = gray;
+                    d_pair_header.style.color = gray;
+                    d_pair_header_pin.style.color = gray;
+
+                } else {
+
+                    if(data.pair_c === "ok"){
+
+                        pair_c_status.innerHTML = data.pair_c.toUpperCase();
+
+                    } else {
+
+                        if (typeof data.pair_c_len !== "undefined") {
+                            pair_c_status.innerHTML = data.pair_c + " " + data.pair_c_len;
+                        } else {
+                            pair_c_status.innerHTML = data.pair_c; 
+                        }
+                    }
+
+                    if(data.pair_d === "ok"){
+
+                        pair_d_status.innerHTML = data.pair_d.toUpperCase();
+
+                    } else {
+
+                        if (typeof data.pair_d_len !== "undefined") {
+                            pair_d_status.innerHTML = data.pair_d + " " + data.pair_d_len;
+                        } else {
+                            pair_d_status.innerHTML = data.pair_d; 
+                        }
+                    }
+
+                }
+            }
+
+           async function table_set_duplex_status(state) {
+
+                port_duplex_state.innerHTML = state;
+
+
+                if (state.toLowerCase() === "flapping") {
+
+
+                    port_duplex_state.style.color = red;
+
+
+                    if (if_flapping.textContent === "" || if_flapping.textContent !== if_flapping_b) {
+
+                        if_flapping.innerHTML = if_flapping_a;
+                        if_flapping.style.display = "block";
+                    }
+
+
+                } else if (state.toLowerCase() === "unknown!") {
+
+                    port_duplex_header.style.color = black;
+                    port_duplex_header.style.display = "block";
+                    port_duplex_state.style.color = red;
+
+                    if_flapping.innerHTML = if_flapping_b;
+                    if_flapping.style.display = "block";
+
+                } else {
+
+                    port_duplex_state.style.color = "#000";
+                }
+
+                await get_port_admin_status(global_port);
+            }
+
+
+            function table_set_speed_status(state) {
+                
+                port_speed_state.innerHTML = state;
+
+                
+                if (state.toLowerCase() === "flapping") {
+
+                    
+                    port_speed_state.style.color = red;
+
+                    
+                    if (if_flapping.textContent === "" || if_flapping.textContent !== if_flapping_b) {
+                        
+                        if_flapping.innerHTML = if_flapping_a;
+                        if_flapping.style.display = "block";
+                    }
+
+                
+                } else if (state.toLowerCase() === "unknown!") {
+
+                    port_speed_header.style.color = black;
+                    port_speed_header.style.display = "block";
+                    port_speed_state.style.color = red;
+                
+                    if_flapping.innerHTML = if_flapping_b;
+                    if_flapping.style.display = "block";
+
+                } else {
+                
+                    port_speed_state.style.color = "#000";
+                }
+            }
+
+
+           async function table_Data_link_layer_status(state){
+
+                if_flapping.innerHTML = "";
+
+                if(state == "yes"){
+
+                    port_link_state.innerHTML = "yes"
+                    port_speed_header.style.display = "block";
+                    port_duplex_header.style.display = "block";
+                    port_speed_state.innerHTML = "";
+                    port_duplex_state.innerHTML = "";
+
+
+                    await get_speed_status(global_port);
+                    await get_duplex_status(global_port);
+
+
+                } else {
+
+                    port_link_state.innerHTML = "no"
+                    port_speed_header.style.display = "none";
+                    port_duplex_header.style.display = "none";
+                    port_speed_state.innerHTML = "";
+                    port_duplex_state.innerHTML = "";
+
+                    get_pair_test(global_port);
+
+
+                }
+
+                //await get_speed_status(global_port);
+                //await get_duplex_status(global_port);
+
+            }
+
+           async function clear_all_value_for_test(){
+
+                port_link_state.innerHTML = "";
+                port_speed_state.innerHTML = "";
+                port_duplex_state.innerHTML = "";
+                port_admin_state.innerHTML = "";
+                pair_a_status.innerHTML = "";
+                pair_b_status.innerHTML = "";
+                pair_c_status.innerHTML = "";
+                pair_d_status.innerHTML = "";
+                if_flapping.innerHTML = "";
+
+            }
+
+            async function test(){
+
+                clear_all_value_for_test();
+
+                c_pair_header.style.color = black;
+                c_pair_header_pin.style.color = black;
+                d_pair_header.style.color = black;
+                d_pair_header_pin.style.color = black;
+
+                await get_link_detection_status(global_port);
+
+            }
+
+
+
+
+        </script>
+
+<%+footer%>

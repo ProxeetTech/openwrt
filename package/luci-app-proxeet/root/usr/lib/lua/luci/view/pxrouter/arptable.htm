@@ -1,0 +1,494 @@
+<%+header%>
+    <% local resource=luci.http.context.template_header.resource %>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <meta name="viewport"
+            content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+        <title></title>
+
+        <link rel="stylesheet" href="/luci-static/resources/view/pxrouter/fontawesome.css">
+        <link rel="stylesheet" href="/luci-static/resources/view/pxrouter/all.css">
+
+
+
+        <link rel="stylesheet" href="<%= index_css %>">
+
+        <style>
+
+            :root {
+
+                --proxeet-orange: #FF7E33;
+            --proxeet-blue: #152F4E;
+            --proxeet-swich-background-gray: #F7F7F7;
+            --proxeet-light-blue: #00477A;
+            --proxeet-ll-blue: #95BBDB;
+            --proxeet-white: #FFFFFF;
+            --proxeet-swich-background-gray: #696161;
+            --proxeet-danger: #dc3545;
+            --proxeet-green: #157347;
+
+            --px-dark-bg: #1e1e1e;
+            --px-light-bg: #ffffff;
+
+            --px-argon-btn: #1e1e1e;
+            --px-table-header-dark: #292727;
+            --px-table-header-light: #F7F7F7;
+            }
+
+            body {
+        
+                 background-color: <%= bg_color %>; 
+            }    
+        
+           
+        
+            .btn {
+        
+                color: var(<%= btn_text_color %>);
+                background-color: var(<%= table_header_color %>);
+            }
+        
+           
+        
+        
+            .table-header {
+        
+                padding: 1rem !important;
+                background-color: var(<%= table_header_color %>); 
+                box-shadow: 5px 5px 5px #292727;
+        
+            }
+           
+            
+        
+            </style>
+        
+        <script>
+
+        console.log("<%= btn_text_color %>");
+        console.log("<%= table_header_color %>");
+
+            let api_endpoint = "<%= api_endpoint %>";
+            let table_headers_names = <%= table_headers_names %>;
+
+            const dataFilter = {
+
+                filterDataByIdUp() {
+
+                    data = dataManager.getData();
+                    data.sort((a, b) => b.id - a.id);
+                    dataManager.setData(data);
+                    redraw_data();
+                    console.log("filterDataById");
+
+                },
+                filterDataByIdDown() {
+
+                    data = dataManager.getData();
+                    data.sort((a, b) => a.id - b.id);
+                    dataManager.setData(data);
+                    redraw_data();
+                    console.log("filterDataById");
+
+                },
+                filterDataByIpUp() {
+                    let arpData = dataManager.getData();
+
+
+                    arpData.sort((a, b) => {
+                        const ipA = a.ip || "";
+                        const ipB = b.ip || "";
+
+                        return compareIp(ipA, ipB);
+                    });
+
+                    dataManager.setData(arpData);
+
+                    redraw_data();
+
+                    console.log("filterDataByIpUp");
+                },
+
+                filterDataByIpDown() {
+                    let arpData = dataManager.getData();
+
+
+                    arpData.sort((a, b) => {
+                        const ipA = a.ip || "";
+                        const ipB = b.ip || "";
+
+                        return compareIp(ipB, ipA);
+                    });
+
+                    dataManager.setData(arpData);
+
+                    redraw_data();
+
+                    console.log("filterDataByIpDown");
+                },
+
+
+                compareIp(ipA, ipB) {
+                    const partsA = ipA.split('.').map(Number);
+                    const partsB = ipB.split('.').map(Number);
+
+                    for (let i = 0; i < 4; i++) {
+                        if (partsA[i] !== partsB[i]) {
+                            return partsA[i] - partsB[i];
+                        }
+                    }
+
+                    return 0;
+                },
+
+
+                filterDataByDeviceUp() {
+                    data = dataManager.getData();
+                    data.sort((a, b) => a.dev.localeCompare(b.dev));
+                    dataManager.setData(data);
+                    redraw_data();
+                    console.log("filterDataByDeviceUp");
+                },
+
+                filterDataByDeviceDown() {
+                    data = dataManager.getData();
+                    data.sort((a, b) => b.dev.localeCompare(a.dev));
+                    dataManager.setData(data);
+                    redraw_data();
+                    console.log("filterDataByDeviceDown");
+                },
+                filterDataByType() {
+                    let data = dataManager.getData();
+                    data.sort((a, b) => {
+                        const typeA = a.type || "";
+                        const typeB = b.type || "";
+                        return typeB.localeCompare(typeA);
+                    });
+                    dataManager.setData(data);
+                    redraw_data();
+                    console.log("filterDataByType");
+                },
+                filterDataByFlagsUp() {
+
+                    let data = dataManager.getData();
+                    data.sort((a, b) => {
+                        const flagsA = a.flags || "";
+                        const flagsB = b.flags || "";
+                        return flagsA.localeCompare(flagsB);
+                    });
+                    dataManager.setData(data);
+                    redraw_data();
+                    console.log("filterDataByFlags");
+                },
+
+                filterDataByFlagsDown() {
+                    let data = dataManager.getData();
+                    data.sort((a, b) => {
+                        const flagsA = a.flags || "";
+                        const flagsB = b.flags || "";
+                        return flagsB.localeCompare(flagsA);
+                    });
+                    dataManager.setData(data);
+                    redraw_data();
+                    console.log("filterDataByFlags");
+                },
+
+
+                filterDataByHwAddressUp() {
+                let data = dataManager.getData();
+                if (data && data.length > 0) {
+                    data.sort((a, b) => {
+                        const macA = a.mac || ""; // если поле отсутствует, используем пустую строку
+                        const macB = b.mac || ""; // если поле отсутствует, используем пустую строку
+                        return macA.localeCompare(macB);
+                    });
+                    dataManager.setData(data);
+                    redraw_data();
+                    console.log("filterDataByHwAddressUp");
+                } else {
+                    console.error("No data found for sorting by HW address");
+                }
+            },
+
+            filterDataByHwAddressDown() {
+                let data = dataManager.getData();
+                if (data && data.length > 0) {
+                    data.sort((a, b) => {
+                        const macA = a.mac || ""; // если поле отсутствует, используем пустую строку
+                        const macB = b.mac || ""; // если поле отсутствует, используем пустую строку
+                        return macB.localeCompare(macA);
+                    });
+                    dataManager.setData(data);
+                    redraw_data();
+                    console.log("filterDataByHwAddressDown");
+                } else {
+                    console.error("No data found for sorting by HW address");
+                }
+            },
+
+            }
+
+            function search_in_data() {
+
+                function searchEntries(entries, searchCriteria) {
+                    return entries.filter(entry => {
+                        const searchText = searchCriteria.toLowerCase().trim();
+                        //"id", "ip", "hw_type", "flags", "hw_address", "mask", "device" 
+                        return (
+                            entry.ip.toLowerCase().includes(searchText) ||
+                            entry.hw_address.toLowerCase().includes(searchText) ||
+                            entry.hw_type.toLowerCase().includes(searchText) ||
+                            entry.device.toLowerCase().includes(searchText) ||
+                            entry.flags.toLowerCase().includes(searchText)
+                        );
+                    });
+                }
+
+                let req = document.getElementById("search");
+
+                const searchCriteria = req.value;
+
+                console.log(req.value);
+
+                const result = searchEntries(dataManager.getData(), searchCriteria);
+                console.log(result);
+
+                dataManager.clearData();
+                dataManager.setData(result);
+
+                console.log(JSON.stringify(result));
+                redraw_data();
+            }
+
+            window.onload = async function () {
+
+                try {
+
+
+
+
+                    await fetchData();
+
+                    document.getElementById("search").value = "";
+
+                    let pageDevide = document.getElementById("limit_select");
+                    let totalPages = Math.ceil(Object.keys(dataManager.getData()).length / pageDevide.value);
+                    let currentPage = 1;
+
+                    createPagination(totalPages, currentPage);
+                    set_pagination_button_active(1);
+
+                    wait_data(false);
+
+
+                } catch (error) {
+
+                    console.error("Ошибка при загрузке данных:", error);
+
+                }
+
+            }
+
+
+        </script>
+        <script src="<%= tables_js %>" defer></script>
+
+
+        <style>
+            body {
+
+                background-color: <%=bg_color %>;
+            }
+
+
+
+            .btn {
+
+                color: var(<%=btn_text_color %>);
+                background-color: var(<%=table_header_color %>);
+            }
+
+
+
+
+            .table-header {
+
+                padding: 1rem !important;
+                background-color: var(<%=table_header_color %>);
+                box-shadow: 5px 5px 5px #292727;
+
+            }
+        </style>
+
+
+
+        </head>
+
+        <body>
+
+            <center>
+                <h1 class="" style="color: var(<%= btn_text_color %>);">
+                    <%= page_header %>
+                </h1>
+                
+            </center>
+
+
+            <div style="display: flex; justify-content: center; align-items: center;">
+
+                <div style="display: flex; align-items: center; ">
+                    <p style="margin: 0; padding-right: 5px; display: flex; align-items: center;">Result on page</p>
+            
+
+                    <select id='limit_select'  class="select" style="margin-left: 5px;">
+                        <option onclick="change_limit(10)">10</option>
+                        <option onclick="change_limit(20)">20</option>
+                        <option onclick="change_limit(50)">50</option>
+                        <option onclick="change_limit(100)">100</option>
+                        <option onclick="change_limit(1000)">1000</option>
+                        <option onclick="change_limit('all')">all</option>
+                    </select>
+                </div>
+
+                <button onclick="renew_data()"  class="btn btn-rectangle"  style="margin-left: 10px;">Renew data</button>
+                <!--<button onclick="wait_data(true)"  class="btn btn-rectangle"  style="margin-left: 10px;">wait on</button>
+                <button onclick="wait_data(false)"  class="btn btn-rectangle"  style="margin-left: 10px;">wait off</button>-->
+            </div>
+
+
+            <div style="padding-right: 5rem; margin-top: 2rem; display: flex; justify-content: end; align-items: center;"
+                id="pg_buttons_container">
+            </div>
+
+
+            <div style="padding-right: 5rem; margin-top: 2rem; display: flex; justify-content: end; align-items: center;">
+
+                <input type="text" id="search" placeholder="Search" />
+                <button onclick="clear_field()" class="btn btn-square" style="color: var(<%= btn_text_color %>); background-color: var(<%= table_header_color %>);margin-left: 10px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            
+                <button onclick="search_in_data()" class="btn btn-square" style="color: var(<%= btn_text_color %>); background-color: var(<%= table_header_color %>);margin-left: 10px;">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+            
+            
+            
+            
+            
+            </div>
+
+
+
+            <br />
+            <br />
+            <br />
+
+            <center>
+                <div class="">
+                    <div class="">
+                        <div class="" style="border: 0px solid red">
+                            <div class="" style="width: 100%;">
+                                <div id="table_container" style="position: relative; border: 0px solid red">
+                                    <div id="px_wait_container"
+                                        style="position: absolute; z-index: 600; width: 100%; text-align: center;">
+                                        <div style="position: relative; display: inline-block;">
+                                            <img id="px_wait" style="margin: 2rem; width: 13rem;"
+                                                src="<%= resource %>/img/px.svg" />
+                                            <div id="loading_text"
+                                                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; color: var(--proxeet-white); animation: blink 1s step-start infinite;">
+                                                Loading...
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <center>
+
+                                        <table class="table" >
+                                            <thead class="table-header">
+                                                <tr>
+                                                    <th class="table-header-th">№
+                                                        <div class="icon-container">
+                                                            <!--<i onclick="dataFilter.filterDataByIdUp()"
+                                                                class="fa-solid fa-chevron-up"></i>
+                                                            <i onclick="dataFilter.filterDataByIdDown()"
+                                                                class="fa-solid fa-chevron-down"></i>-->
+                                                        </div>
+                                                    </th>
+                                                    <th>IP address
+                                                        <div class="icon-container">
+                                                            <!--<i onclick="dataFilter.filterDataByIpUp()"
+                                                                class="fa-solid fa-chevron-up"></i>
+                                                            <i onclick="dataFilter.filterDataByIpDown()"
+                                                                class="fa-solid fa-chevron-down"></i>-->
+                                                        </div>
+                                                    </th>
+                                                    <th>HW type
+                                                        <div class="icon-container">
+                                                            <!--<i onclick="dataFilter.filterDataByHwTypeUp()"
+                                                                class="fa-solid fa-chevron-up"></i>
+                                                            <i onclick="dataFilter.filterDataByHwTypeDown()"
+                                                                class="fa-solid fa-chevron-down"></i>-->
+                                                        </div>
+                                                    </th>
+                                                    <th>Flags
+                                                        <div class="icon-container">
+                                                            <!--<i onclick="dataFilter.filterDataByFlagsUp()" class="fa-solid fa-chevron-up"></i>
+                                                            <i onclick="dataFilter.filterDataByFlagsDown()" class="fa-solid fa-chevron-down"></i>-->
+                                                        </div>
+                                                    </th>
+                                                    <th>HW address
+                                                        <div class="icon-container">
+                                                            <!--<i onclick="dataFilter.filterDataByHwAddressUp()" class="fa-solid fa-chevron-up"></i>
+                                                            <i onclick="dataFilter.filterDataByHwAddressDown()" class="fa-solid fa-chevron-down"></i>-->
+                                                        </div>
+                                                    </th>
+                                                    <th>Mask
+                                                        <div class="icon-container">
+                                                            <!--<i onclick="dataFilter.filterDataByMaskUp()"
+                                                                class="fa-solid fa-chevron-up"></i>
+                                                            <i onclick="dataFilter.filterDataByMaskDown()"
+                                                                class="fa-solid fa-chevron-down"></i>-->
+                                                        </div>
+                                                    </th>
+                                                    <th>Device
+                                                        <div class="icon-container">
+                                                           <!-- <i onclick="dataFilter.filterDataByDeviceUp()"
+                                                                class="fa-solid fa-chevron-up"></i>
+                                                            <i onclick="dataFilter.filterDataByDeviceDown()"
+                                                                class="fa-solid fa-chevron-down"></i>-->
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody id="main_mac_table">
+
+
+                                            </tbody>
+
+                                        </table>
+                                    </center>
+                                </div>
+
+
+
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </center>
+
+            <script>
+
+
+
+            </script>
+
+
+            <%+footer%>

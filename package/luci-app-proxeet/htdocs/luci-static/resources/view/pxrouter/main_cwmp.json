@@ -1,0 +1,35 @@
+[
+    {
+        "parametr": "@local[0].enable"
+        
+    },
+    {
+        "parametr": "@acs[0].url"
+        
+    },
+    {
+        "parametr": "@acs[0].username"
+        
+    },
+    {
+        "parametr": "@acs[0].password"
+        
+    },
+    {
+        "parametr": "@acs[0].periodic_enable"
+        
+    },
+    {
+        "parametr": "@acs[0].periodic_interval"
+        
+    },
+    {
+        "parametr": "@local[0].port"
+        
+    },
+    {
+        "parametr": "@local[0].interface"
+        
+    }
+
+]

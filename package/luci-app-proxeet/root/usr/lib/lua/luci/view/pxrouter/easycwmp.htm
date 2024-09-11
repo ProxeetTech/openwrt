@@ -1,0 +1,676 @@
+<%+header%>
+    <% local resource=luci.http.context.template_header.resource %>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <meta name="viewport"
+            content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+        <title></title>
+
+
+        <link rel="stylesheet" href="/luci-static/resources/view/pxrouter/fontawesome.css">
+        <link rel="stylesheet" href="/luci-static/resources/view/pxrouter/all.css">
+
+
+        <link rel="stylesheet" href="<%= index_css %>">
+
+        <style>
+            body {
+
+                background-color: <%=bg_color %>;
+            }
+
+
+
+            .btn {
+
+                color: var(<%=btn_text_color %>);
+                background-color: var(<%=table_header_color %>);
+            }
+
+
+
+
+            .table-header {
+
+                padding: 1rem !important;
+                background-color: var(<%=table_header_color %>);
+                box-shadow: 5px 5px 5px #292727;
+
+            }
+
+            .modal_ {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 15%;
+                top: 20%;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.0);
+                border: 0;
+            }
+
+            .modal-content {
+                background-color: white;
+                margin: 15% auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 100%;
+                max-width: 500px;
+            }
+
+            .close {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+            }
+
+            .close:hover,
+            .close:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            input {
+                box-sizing: border-box;
+            }
+            #main_mac_table td {
+                text-align: left; 
+                padding: 8px;     
+            }
+        </style>
+
+        <script>
+
+            let api_endpoint = "<%= api_endpoint %>";
+            let table_headers_names = <%= table_headers_names %>;
+
+            function get_limit(){
+
+                let limit_select = document.getElementById("limit_select").value;
+
+                    if( limit_select == "all"){
+
+                        limit_select = Object.keys(transformJson(dataManager.getData()));
+
+                        console.log("limit if all "+limit_select)
+                    } 
+
+
+
+                return limit_select;
+
+            }
+
+            function change_limit(value){
+
+                renew_data();
+
+            }
+
+            function modal_close() {
+
+                modal.style.display = "none";
+
+            }
+
+            function sendPostRequest() {
+
+
+
+                let input_in_modal_key = document.getElementById("input_in_modal_key").textContent;
+                let input_in_modal_value = document.getElementById("input_in_modal_value").value;
+
+                const dataValue = input_in_modal_key + "='" + input_in_modal_value + "'";
+                console.log(dataValue);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/cgi-bin/luci/pxrouter/post_easycwmp_parametr", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        console.log("Response: " + JSON.stringify(response));
+                        modal_close();
+                        wait_data(true);
+                        setTimeout(renew_data, 1500);
+
+                    }
+                };
+
+
+                xhr.send("data=" + encodeURIComponent(dataValue));
+            }
+
+            const dataManager = {
+
+                // Usage
+                //dataManager.setData({ key: 'value' });
+                //dataManager.clearData();
+                //console.log(dataManager.getData());  // { key: 'value' }
+
+                data: {},
+
+                setData(newData) {
+                    this.data = newData;
+                },
+
+                clearData() {
+
+                    this.data = {};
+                },
+
+                getData() {
+                    return this.data;
+                }
+            };
+
+            function wait_data(value) {
+
+
+
+                let wait_container = document.getElementById("px_wait_container");
+                let main_mac_table = document.getElementById("main_mac_table");
+
+                if (value) {
+
+                    /*  wait_container.style.display = "block";
+                     main_mac_table.style.visibility = "hidden"; */
+
+                } else {
+
+                    wait_container.style.display = "none";
+                    main_mac_table.style.visibility = "visible";
+
+                }
+            }
+
+            async function clear_table() {
+
+                let table_body = document.getElementById("main_mac_table");
+
+                table_body.innerHTML = "";
+
+            }
+
+            async function redraw_data() {
+
+                wait_data(true);
+
+                await clear_table();
+
+                await processData();
+
+                wait_data(false);
+
+
+            }
+
+            function renew_data() {
+
+                let table_body = document.getElementById("main_mac_table");
+
+                table_body.innerHTML = "";
+
+                fetchData();
+
+            }
+
+            function fetchData() {
+                return new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open("GET", api_endpoint, true);
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState === 4) {
+                            if (xhr.status === 200) {
+
+                                let jsonData = JSON.parse(xhr.responseText);
+
+                                dataManager.setData(jsonData);
+
+                                processData();
+                                resolve(jsonData);
+                            } else {
+
+                                reject(new Error("Failed to fetch data"));
+                            }
+                        }
+                    };
+                    xhr.send();
+                });
+            }
+
+            async function processData() {
+
+
+                data = dataManager.getData();
+
+                let limit = get_limit();
+
+                /* console.dir(data);
+                let limit_from_select = "all";
+
+                let limit;
+
+                if (limit_from_select === "all") {
+
+
+                    limit = Object.keys(data).length;
+                    console.log("lines in table: " + limit)
+                } else {
+                    limit = parseInt(limit_from_select);
+                } */
+
+
+                add_cell_to_table(data, limit)
+
+
+            }
+
+            function transformJson(inputJson) {
+
+
+                if (Array.isArray(inputJson) && inputJson.length > 0 && typeof inputJson[0] === 'object' && 'parametr' in inputJson[0] && 'value' in inputJson[0]) {
+                    return inputJson;
+                }
+
+                let parsedData = typeof inputJson === 'string' ? JSON.parse(inputJson) : inputJson;
+
+
+                let result = [];
+
+
+                for (let key in parsedData) {
+
+                    console.log(parsedData[key]);
+                    let value = parsedData[key].replace(/^'|'$/g, '');
+
+
+
+                    result.push({ "parametr": key, "value": value });
+                }
+
+                return result;
+            }
+
+            function add_cell_to_table(data, limit, start = 0) {
+
+                let table_body = document.getElementById("main_mac_table");
+
+                console.log("table body: " + table_body);
+
+                const data_ = transformJson(data);
+
+
+                for (let i = start; i < limit; i++) {
+
+
+                    let entry = data_[i];
+                    console.log("current value: " + entry);
+
+                    let row = document.createElement("tr");
+
+                    const params = table_headers_names;
+                    console.log(params);
+
+                    params.forEach(param => {
+
+                        console.log(param);
+
+                        let cell = document.createElement("td");
+
+                        if (param == 'id') {
+
+                            cell.textContent = i;
+                        } else if (param == 'parametr') {
+
+                            cell.textContent = data_[i].parametr;
+
+                        } else if (param == 'value') {
+
+                            //cell.textContent = data_value[i];
+                            cell.textContent = data_[i].value.replace(/'/g, '');
+
+                        } else if (param == 'btn') {
+
+                            let btn = document.createElement("button");
+                            btn.id = "editButton_" + i + "_" + data_[i].parametr;
+                            btn.className = "btn btn-edit";
+                            btn.style.cssText = "padding: 5px; border: none; background-color: transparent;";
+
+                            btn.onclick = (function (i, key, value) {
+                                return function () {
+
+                                    let modal = document.getElementById("modal");
+                                    modal.style.display = "block";
+
+                                    let input_in_modal_value = document.getElementById("input_in_modal_value");
+                                    let input_in_modal_key = document.getElementById("input_in_modal_key");
+
+                                    input_in_modal_value.value = value.replace(/'/g, '');
+                                    input_in_modal_key.innerHTML = key;
+
+                                    console.log("id: " + i);
+                                    console.log("key: " + key);
+                                    console.log("value: " + value);
+                                };
+                            })(i, data_[i].parametr, data_[i].value);
+
+
+                            let icon = document.createElement("i");
+                            icon.className = "fa fa-pen";
+
+                            btn.appendChild(icon);
+
+                            cell.appendChild(btn);
+                        }
+
+
+
+
+
+                        row.appendChild(cell);
+
+                    });
+
+                    table_body.appendChild(row);
+                }
+
+                wait_data(false);
+            }
+
+            function search_in_data() {
+
+                function searchEntries(entries, searchCriteria) {
+                    return entries.filter(entry => {
+                        const searchText = searchCriteria.toLowerCase().trim();
+                        return (
+                            entry.parametr.toLowerCase().includes(searchText) ||
+                            entry.value.toLowerCase().includes(searchText)
+                        );
+                    });
+                }
+
+                let req = document.getElementById("search");
+
+                const searchCriteria = req.value;
+
+                let data_ = transformJson(dataManager.getData());
+
+
+                console.dir(data_);
+
+                const result = searchEntries(data_, searchCriteria);
+
+                console.dir(result);
+
+                dataManager.clearData();
+                dataManager.setData(result);
+
+
+                redraw_data();
+            }
+
+            document.addEventListener('keyup', event => {
+
+                if (event.code === 'Enter') {
+
+                    console.log("search call");
+                    search_in_data();
+                }
+
+            });
+
+            function clear_field() {
+
+                console.log("clear_field call");
+
+                let field = document.getElementById("search");
+                field.value = "";
+
+                dataManager.clearData();
+
+                fetchData();
+
+            }
+
+            window.onload = async function () {
+
+                try {
+
+
+                    document.getElementById("search").value = "";
+                
+                    let pageDevide = get_limit();
+
+                    console.log("Разбивка: "+pageDevide);
+
+                    let totalPages = Math.ceil(Object.keys(dataManager.getData()).length / pageDevide.value);
+                    let currentPage = 1;
+
+                    await fetchData();
+
+                    wait_data(false);
+
+
+                } catch (error) {
+
+                    console.error("Ошибка при загрузке данных:", error);
+
+                }
+
+            }
+
+
+        </script>
+
+
+
+
+        </head>
+
+        <body>
+
+
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <h1 class="" style="color: var(<%= btn_text_color %>);">
+                    <%= page_header %>
+                </h1>
+            </div>
+
+            <div id="modal" style="display: none;" class="modal_">
+                <div class="modal-content">
+                    <span class="close" onclick="modal_close()">&times;</span>
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <h1 style="font-size: 1.8rem; color: var(--proxeet-blue);">CWMP edit</h1>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <p style="font-size: 1.2rem; color: var(--proxeet-blue); margin-right: 1rem; line-height: 1.5;"
+                            id="input_in_modal_key"></p>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <input type="text"
+                            style="background-color: white; color: var(--proxeet-blue); border-color: var(--proxeet-blue) !important; max-width: 280px !important; width: 280px !important; margin: 1rem;"
+                            id="input_in_modal_value" value="value">
+                    </div>
+                    
+
+                    <div style="display: flex; justify-content: end; margin-top: 1rem;">
+                        <button onclick="modal_close()"
+                            style="
+                                    border: 0 !important;
+                                    background-color: var(--proxeet-danger);
+                                    color: var(--proxeet-white);
+                                    margin-right: 1rem;
+                                    width: 6rem;
+                                    height: 2rem;
+                                "
+                            id="cancel_modal">Cancel</button>
+                        <button onclick="sendPostRequest()"
+                            style="
+                                    border: 0 !important;
+                                    background-color: var(--proxeet-green);
+                                    color: var(--proxeet-white);
+                                    width: 3rem;
+                                    height: 2rem;
+                                ">OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div style="display: flex; justify-content: center; align-items: center;">
+
+               <!--  <div id="modal" class="modal_">
+                    <div class="modal-content">
+                        <span class="close" onclick="modal_close()">&times;</span>
+                        <div style="text-align: center; margin-bottom: 1rem;">
+                            <h1 style="font-size: 1.8rem; color: var(--proxeet-blue);">CWMP edit</h1>
+                        </div>
+
+                        <div style="display: flex; align-items: baseline; margin-bottom: 1rem;">
+                            <p style="font-size: 1.2rem; color: var(--proxeet-blue); margin-right: 1rem; line-height: 1.5;"
+                                id="input_in_modal_key"></p>
+                            <input type="text"
+                                style="background-color: white;  color: var(--proxeet-blue); border-color: var(--proxeet-blue) !important; flex-grow: 1; margin: 1rem;"
+                                id="input_in_modal_value" value="value">
+                        </div>
+
+                        <div style="display: flex; justify-content: end; margin-top: 1rem;">
+                            <button onclick="modal_close()"
+                                style="border: 0 !important; background-color: var(--proxeet-danger); color: var(--proxeet-white); margin-right: 1rem;"
+                                id="cancel_modal">Cancel</button>
+                            <button onclick="sendPostRequest()"
+                                style="border: 0 !important; background-color: var(--proxeet-green); color: var(--proxeet-white);">OK</button>
+                        </div>
+                    </div>
+                </div>
+ -->
+
+
+                <div style="display: flex; align-items: center; ">
+                    <div style="display: flex; align-items: center;">
+                        <p style="margin: 0; padding-right: 5px; display: flex; align-items: center;">Result on page</p>
+                
+                        <select id='limit_select' class="select" style="margin-left: 5px;" onchange="change_limit(this.value)">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="1000">1000</option>
+                            
+                        </select>
+                    </div>
+
+                </div>
+
+                <button onclick="renew_data()" class="btn btn-rectangle" style="margin-left: 10px;">Renew data</button>
+                <!-- <button onclick="sendPostRequest()">TEST post</button> -->
+            </div>
+
+
+            <div style="padding-right: 5rem; margin-top: 2rem; border: 0px solid red; display: flex; justify-content: end; align-items: center;"
+                id="pg_buttons_container">
+
+
+
+
+            </div>
+
+
+            <div
+                style="padding-right: 5rem; margin-top: 2rem; display: flex; justify-content: end; align-items: center;">
+                <input type="text" id="search" placeholder="Search" />
+                <button onclick="clear_field()" class="btn btn-square"
+                    style="color: var(<%= btn_text_color %>); background-color: var(<%= table_header_color %>);margin-left: 10px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <button onclick="search_in_data()" class="btn btn-square"
+                    style="color: var(<%= btn_text_color %>); background-color: var(<%= table_header_color %>);margin-left: 10px;">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+
+
+
+            </div>
+
+
+
+
+            <center>
+                <div class="">
+
+                    <div class="">
+                        <div class="" style="border: 0px solid red">
+                            <div class="" style="width: 80%;">
+                                <div id="table_container" style="position: relative; margin-top: 3rem; border: 0px solid red">
+                                    <div id="px_wait_container"
+                                        style="position: absolute; z-index: 600; width: 100%; text-align: center;">
+                                        <div style="position: relative; display: inline-block;">
+                                            <img id="px_wait" style="margin: 2rem; width: 13rem;"
+                                                src="<%= resource %>/img/px.svg" />
+                                            <div id="loading_text"
+                                                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; color: var(--proxeet-white); animation: blink 1s step-start infinite;">
+                                                Loading...
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <center>
+                                        <table class="table" style="margin-bottom: 4rem;">
+                                            <thead class="table-header">
+                                                <tr>
+                                                    <th class="table-header-th">№
+                                                        <div class="icon-container">
+
+                                                        </div>
+                                                    </th>
+                                                    <th>Parameter
+                                                        <div class="icon-container">
+
+                                                        </div>
+                                                    </th>
+                                                    <th>Value
+                                                        <div class="icon-container">
+
+                                                        </div>
+                                                    </th>
+                                                    <th>Edit
+                                                        <div class="icon-container">
+
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody id="main_mac_table">
+                                            </tbody>
+
+                                        </table>
+                                    </center>
+                                </div>
+
+
+
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </center>
+
+
+
+            <%+footer%>

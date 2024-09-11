@@ -1,0 +1,143 @@
+ 
+   body {
+
+             /* background-color: #1e1e1e; */
+        }
+
+        :root {
+
+            --proxeet-orange: #FF7E33;
+            --proxeet-blue: #152F4E;
+            --proxeet-swich-background-gray: #F7F7F7;
+            --proxeet-light-blue: #00477A;
+            --proxeet-ll-blue: #95BBDB;
+            --proxeet-white: #FFFFFF;
+            --proxeet-swich-background-gray: #696161;
+            --proxeet-danger: #dc3545;
+            --proxeet-green: #157347;
+
+            --px-dark-bg: #1e1e1e;
+            --px-light-bg: #ffffff;
+
+            --px-argon-btn: #1e1e1e;
+            --px-table-header-dark: #292727;
+            --px-table-header-light: #F7F7F7;
+        }
+
+
+        .select {
+
+            margin: 1rem;
+            height: 2.8rem;
+          
+        }
+
+
+        .btn-rectangle {
+
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: .5rem;
+            padding-bottom: .5rem;
+        }
+    
+        .btn-square {
+    
+            white-space: normal !important;
+           
+        }
+
+
+        tr {
+
+            padding-bottom: .7rem;
+            padding-top: .7rem;
+    
+        }
+        td {
+    
+            padding-bottom: .7rem;
+            padding-top: .7rem;
+            border-bottom: 1px solid #696969;
+    
+        }
+    
+        .table-header-th {
+    
+            padding-left: 0.7rem;
+            padding-right: 0.7rem;
+            padding-top: 0.7rem;
+            padding-bottom: 0.7rem;
+    
+        }
+    
+
+        tr {
+
+            text-align: center;
+        }
+
+
+        .icon-container {
+        position: relative;
+        display: inline-block;
+
+        width: 24px; 
+        height: 24px; 
+        }
+
+        .icon-container i {
+        position: absolute;
+        padding-left: 10px;
+        top: 0;
+        left: 0;
+        font-size: 18px;
+        }
+
+        .icon-container .fa-chevron-down {
+        top: 10px;
+        }
+
+        
+        .active-pagination-button {
+        
+            border: 1px solid #52a8ec !important;
+            
+        }
+
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        #px_wait {
+            animation: rotate 6s linear infinite;
+        }
+
+        #px_wait_container {
+            position: absolute;
+            top: 3rem;
+            left: 50%;
+            transform: translate(-50%, 0);
+            z-index: 600;
+            width: 100%;
+            text-align: center;
+        }
+
+        #loading_text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: red;
+            animation: blink 1s step-start infinite;
+        }
