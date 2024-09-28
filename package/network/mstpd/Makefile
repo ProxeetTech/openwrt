@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mstpd
-PKG_VERSION:=0.1.0
+PKG_VERSION:=0.0.8
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/mstpd/mstpd/tar.gz/$(PKG_VERSION)?
-PKG_HASH:=03d1ff4ca189d54322562cb2891888768af719d2c73ceafa5f1ca96133dffeb2
+PKG_HASH:=dd6492039368efff0bd13b3f9c8bb32d859ebfe258a70ef23b2163c4b6c35f0c
 
 PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=GPL-2.0-or-later
@@ -53,6 +53,10 @@ define Package/mstpd/install
 	$(INSTALL_BIN) ./files/etc/init.d/mstpd.init $(1)/etc/init.d/mstpd
 	$(INSTALL_DIR) $(1)/sbin
 	$(INSTALL_BIN) ./files/sbin/bridge-stp $(1)/sbin
+	$(INSTALL_DIR) $(1)/lib/functions
+	$(INSTALL_BIN) ./files/lib/functions/mstpd.sh $(1)/lib/functions/mstpd.sh
+	$(INSTALL_DIR) $(1)/usr/libexec/mstpctl-utils
+	$(INSTALL_BIN) ./files/usr/libexec/mstpctl-utils/mstpd-config-migrate.sh $(1)/usr/libexec/mstpctl-utils/mstpd-config-migrate.sh
 endef
 
 $(eval $(call BuildPackage,mstpd))
