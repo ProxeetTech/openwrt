@@ -21,11 +21,11 @@ local methods = {
 				local br
 
 				bridges = json.parse(util.exec(
-					"/sbin/mstpctl --format=json showbridge " .. args.bridge) or {})
+					"/usr/sbin/mstpctl --format=json showbridge " .. args.bridge) or {})
 
 				if #bridges > 0 then
 					bridges[1].ports = json.parse(util.exec(
-						"/sbin/mstpctl --format=json showportdetail " .. args.bridge) or {})
+						"/usr/sbin/mstpctl --format=json showportdetail " .. args.bridge) or {})
 				end
 			else
 				-- Get information about all bridges
@@ -34,11 +34,11 @@ local methods = {
 					local bridges_list = table.concat(uci_bridges, " ")
 
 					bridges = json.parse(util.exec(
-						"/sbin/mstpctl --format=json showbridge %s" % bridges_list) or {})
+						"/usr/sbin/mstpctl --format=json showbridge %s" % bridges_list) or {})
 
 					for i, br in ipairs(bridges) do
 						br.ports = json.parse(util.exec(
-							"/sbin/mstpctl --format=json showportdetail " .. br.bridge) or {})
+							"/usr/sbin/mstpctl --format=json showportdetail " .. br.bridge) or {})
 					end
 				end
 			end
