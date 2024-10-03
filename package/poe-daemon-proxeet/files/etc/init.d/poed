@@ -1,0 +1,38 @@
+#!/bin/sh /etc/rc.common
+#
+# PoE Daemon Init Script
+#
+# Copyright (C) 2024 Proxeet Ltd.
+# Author: Aleksei Vasilenko <a.vasilenko@proxeet.com>
+#
+
+START=90
+STOP=10
+
+USE_PROCD=1
+
+PROG=/usr/bin/poed
+PID_FILE=/var/run/poed.pid
+
+start_service() {
+    procd_open_instance
+    procd_set_param command "$PROG"
+    procd_set_param respawn
+    procd_set_param stderr 1
+    procd_set_param stdout 1
+    procd_set_param pidfile "$PID_FILE"
+    
+    procd_add_reload_trigger /etc/config/poed_config
+    
+    procd_close_instance
+}
+
+stop_service() {
+    procd_kill_instance
+}
+
+reload_service() {
+    stop
+    start
+}
+
