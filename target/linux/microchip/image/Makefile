@@ -27,6 +27,12 @@ ifeq ($(SUBTARGET),lan9694)
   TARGET_DEVICES += pxrouter
 endif
 
+define Image/Prepare
+	mkdir -p $(TARGET_DIR)/lib/boot/
+	$(CP) $(KDIR)/Image.gz $(TARGET_DIR)/lib/boot/
+	$(CP) $(DTS_DIR)/microchip/lan969x_ev23x71a.dtb $(TARGET_DIR)/lib/boot/
+endef
+
 $(eval $(call Image/gzip-ext4-padded-squashfs))
 
 $(eval $(call BuildImage))
