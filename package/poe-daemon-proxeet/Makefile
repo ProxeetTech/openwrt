@@ -36,6 +36,8 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/poed $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/poed $(1)/etc/init.d/
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_BIN) ./files/etc/config/poed $(1)/etc/config/
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))
