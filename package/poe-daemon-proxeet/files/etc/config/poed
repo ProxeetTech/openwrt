@@ -1,0 +1,79 @@
+config general
+	option log_level 'debug'
+	option unix_socket_enable '1'
+	option unix_socket_path '/var/run/poed.sock'
+
+config controller
+	option path '/sys/bus/i2c/devices/i2c-8/8-002c'
+	option ports '4'
+	option total_power_budget '120'
+
+config controller
+	option path '/sys/bus/i2c/devices/i2c-8/8-000c'
+	option ports '4'
+	option total_power_budget '120'
+
+config port
+	option name 'eth9'
+	option controller '0'
+	option port_number '0'
+	option power_budget '15'
+	option mode 'AUTO'
+	option priority '1'
+
+config port
+	option name 'eth10'
+	option controller '0'
+	option port_number '1'
+	option power_budget '15'
+	option mode 'AUTO'
+	option priority '2'
+
+config port
+	option name 'eth11'
+	option controller '0'
+	option port_number '2'
+	option power_budget '19'
+	option mode 'AUTO'
+	option priority '2'
+
+config port
+	option name 'eth12'
+	option controller '0'
+	option port_number '3'
+	option power_budget '15
+	option mode 'AUTO'
+	option priority '2'
+
+config port
+	option name 'eth13'
+	option controller '1'
+	option port_number '0'
+	option power_budget '15'
+	option mode 'AUTO'
+	option priority '2'
+
+config port
+	option name 'eth14'
+	option controller '1'
+	option port_number '1'
+	option power_budget '15'
+	option mode 'AUTO'
+	option priority '2'
+
+config port
+	option name 'eth15'
+	option controller '1'
+	option port_number '2'
+	option power_budget '15'
+	option mode 'AUTO'
+	option priority '2'
+
+config port
+	option name 'eth16'
+	option controller '1'
+	option port_number '3'
+	option power_budget '15'
+	option mode 'AUTO'
+	option priority '2'
+
