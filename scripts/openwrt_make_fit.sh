@@ -3,11 +3,11 @@
 # Get the directory where the script is located
 # SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_DIR=$1
+ROOTFS_IMG=$SCRIPT_DIR/$2
 
 # Paths to your build artifacts      
 KERNEL_IMAGE="$SCRIPT_DIR/Image.gz"
 DEVICE_TREE="$SCRIPT_DIR/lan969x_ev23x71a.dtb"
-ROOTFS_IMG="$SCRIPT_DIR/openwrt-microchip-lan9694-rootfs.cpio.gz"
 UNCOMPRESSED_ROOTFS="$SCRIPT_DIR/rootfs.cpio"
 URAMDISK_IMAGE="$SCRIPT_DIR/uRamdisk"
 
